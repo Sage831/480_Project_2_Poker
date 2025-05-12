@@ -201,6 +201,7 @@ def UCB1(wins, rounds, total_simulations, c):
 def monte_carlo_search_tree(my_cards, community_cards, c=1.4, time_limit=10.0):
 
     deck_of_cards = full_deck()                                                 #creates full deck of cards
+    random.shuffle(deck_of_cards)                                               #shuffles deck of cards
     for card in my_cards + community_cards:                                     #iterates through my cards and community cards
         deck_of_cards.remove(card)                                              #removes those cards from the deck
 
@@ -214,22 +215,22 @@ def monte_carlo_search_tree(my_cards, community_cards, c=1.4, time_limit=10.0):
     start = time.time()                                                         #sets timer
 
     while time.time() - start < time_limit:                                     #while timer limit hasn't been reached
-        opponents_best_hand, best_score = None, -float('inf')                   #sets best_hand to None and best_score to negative infinity
+        opponents_current_hand, best_score = None, -float('inf')                #sets opponents_current_hand to None and best_score to negative infinity
         for hand, (wins, visits) in stats.items():                              #iterates through all possible opponent hands to find highest UCB1 score
             current_score = UCB1(wins, visits, total_rollouts, c)               #calculates scores with UCB1() function
             if current_score > best_score:                                      #if current score better, set best score to current score
-                best_score, opponents_best_hand = current_score, hand           #tuple unpacking
+                best_score, opponents_current_hand = current_score, hand        #tuple unpacking
 
         deck_copy = deck_of_cards.copy()                                        #make copy of deck of cards
         random.shuffle(deck_copy)                                               #shuffle deck copy
-        for card in opponents_best_hand:                                        #iterates through opponent's hand      
+        for card in opponents_current_hand:                                     #iterates through opponent's hand      
             deck_copy.remove(card)                                              #removes opponent's cards from deck copy
         community_cards_copy = community_cards.copy()                           #makes copy of community cards
         for table_cards in range(5 - len(community_cards_copy)):                #determines remaining community cards to deal
             community_cards_copy.append(deck_copy.pop())                        #pops card from deck copy and appends to community cards copy
 
         my_hand = evaluate_best_hand(my_cards + community_cards_copy)                                       #determines value of my hand
-        opponents_hand = evaluate_best_hand(list(opponents_best_hand) + community_cards_copy)               #determines value of opponent's hand
+        opponents_hand = evaluate_best_hand(list(opponents_current_hand) + community_cards_copy)            #determines value of opponent's hand
         if my_hand > opponents_hand:                                                                        #if my hand is better, result = 1.0
             result = 1.0
         elif my_hand == opponents_hand:                                                                     #if the hands tie, result = 0.5
@@ -237,8 +238,8 @@ def monte_carlo_search_tree(my_cards, community_cards, c=1.4, time_limit=10.0):
         else:                                                                                               #if opponent's hand is better, result = 0.0
             result = 0.0
 
-        stats[opponents_best_hand][1] += 1                                      #increments visit count for hand
-        stats[opponents_best_hand][0] += result                                 #add result to win calculation
+        stats[opponents_current_hand][1] += 1                                   #increments visit count for hand
+        stats[opponents_current_hand][0] += result                              #add result to win calculation
         total_rollouts += 1                                                     #increment rollout
 
     total_wins = 0.0                                                            #sets total_wins to 0
