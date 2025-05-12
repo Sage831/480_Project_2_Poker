@@ -50,29 +50,6 @@ def deal_opponents_cards(my_cards, community_cards):
     return opponents_cards                                                      #returns oppenent's cards
 
 
-def deal_remaining_community_cards(my_cards, opponent_cards, community_cards):
-
-    deck_of_cards = full_deck()                                                 #creates a deck of cards using full_deck()
-    random.shuffle(deck_of_cards)                                               #shuffles deck of cards
-    
-    for card in my_cards:                                                       #iterates through my cards
-        deck_of_cards.remove(card)                                              #removes cards in my hand from the deck of cards
-
-    for card in community_cards:                                                #iterates through community cards
-        deck_of_cards.remove(card)                                              #removes community cards from the deck of cards
-
-    for card in opponent_cards:                                                 #iterates through opponent's cards
-        deck_of_cards.remove(card)                                              #removes opponent's cards from the deck of cards
-
-    cards_to_deal = 5 - len(community_cards)                                    #determines number of cards to finish dealing community cards
-    
-    while cards_to_deal != 0:                                                   #while loop to deal cards while community cards is less than 5
-        community_cards.append(deck_of_cards.pop())                             #deals a random card to community cards
-        cards_to_deal = 5 - len(community_cards)                                #determines new number of cards needed to be dealt
-    
-    return community_cards                                                      #returns fully dealt community cards
-
-
 def rank_hand(five_card_hand):
 
     card_rank = {'2':1,'3':2,'4':3,'5':4,'6':5,'7':6,'8':7,'9':8,'10':9,        #hashmap to assign values to cards
